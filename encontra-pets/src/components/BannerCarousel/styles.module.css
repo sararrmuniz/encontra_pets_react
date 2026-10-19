@@ -1,0 +1,241 @@
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(69, 26, 3, 0.1);
+}
+
+.slidesWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  display: flex;
+  align-items: center;
+}
+
+.slide.active {
+  opacity: 1;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(69, 26, 3, 0.85) 0%, rgba(69, 26, 3, 0.4) 60%, rgba(0, 0, 0, 0) 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(100%, 42rem);
+  padding: 0 5rem;
+  color: #fff;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.badge_adoption {
+  background-color: rgb(16 185 129 / 90%);
+}
+
+.badge_lost {
+  background-color: rgb(244 63 94 / 90%);
+}
+
+.badge_found {
+  background-color: rgb(14 165 233 / 90%);
+}
+
+.title {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.description {
+  color: #e5e7eb;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  margin-bottom: 1.5rem;
+  line-height: 1.625;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  color: white;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.actionBtn_primary {
+  font-weight: 700;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 20%);
+}
+
+.actionBtn_adoption {
+  background-color: var(--color-brand-500);
+}
+
+.actionBtn_adoption:hover {
+  background-color: var(--color-brand-600);
+}
+
+.actionBtn_lost {
+  background-color: #f43f5e;
+}
+
+.actionBtn_lost:hover {
+  background-color: #e11d48;
+}
+
+.actionBtn_found {
+  background-color: #0ea5e9;
+}
+
+.actionBtn_found:hover {
+  background-color: #0284c7;
+}
+
+.actionBtn_secondary {
+  background-color: rgb(255 255 255 / 20%);
+  backdrop-filter: blur(12px);
+}
+
+.actionBtn_secondary:hover {
+  background-color: rgb(255 255 255 / 30%);
+}
+
+.actionBtn:hover {
+  transform: translateY(-2px);
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.navBtn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: #451a03;
+}
+
+.prevBtn { left: 15px; }
+.nextBtn { right: 15px; }
+
+.dotsContainer {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.activeDot {
+  background: #fff;
+  width: 24px;
+  border-radius: 10px;
+}
+
+@media (max-width: 670px) {
+  .carouselContainer {
+    height: 440px;
+  }
+
+  .content {
+    padding: 0 3rem;
+  }
+
+  .description {
+    margin-bottom: 1rem;
+  }
+
+  .actions {
+    gap: 0.5rem;
+  }
+
+  .navBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .prevBtn { left: 8px; }
+  .nextBtn { right: 8px; }
+
+  .actionBtn {
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+  }
+}

@@ -1,10 +1,20 @@
 import { Container } from '@/components/Container'
 import { Header } from '@/components/Header'
+import { BannerCarousel } from '@/components/BannerCarousel'
+import { Section } from '@/components/Section'
 
 export default function App() {
   return (
-    <Container>
+    <>
       <Header />
-    </Container>
+
+      <main>
+        <Section>
+          <Container>
+            <BannerCarousel />
+          </Container>
+        </Section>
+      </main>
+    </>
   )
 }
