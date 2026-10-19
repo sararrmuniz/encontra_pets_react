@@ -1,78 +1,96 @@
-# React + TypeScript + Vite
+# 🐾 Encontra Pets
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Uma aplicação web em desenvolvimento para aproximar animais de estimação de quem pode ajudar: encontrar um lar, reencontrar sua família ou receber cuidados.
 
-Currently, two official plugins are available:
+O projeto está sendo construído com foco em uma experiência acolhedora, responsiva e simples de usar. Esta versão já apresenta a identidade visual, a navegação principal e um carrossel de banners para adoção, pets perdidos e animais encontrados.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ O que já está implementado
 
-## React Compiler
+- **Cabeçalho responsivo** com navegação para telas grandes e menu móvel.
+- **Carrossel de banners** com três temas, ícones, botões e indicadores.
+- **Controles do carrossel** para avançar, voltar ou selecionar um slide; a rotação automática pausa quando o cursor está sobre o banner.
+- **Layout adaptável** para diferentes larguras de tela.
+- **Componentes reutilizáveis** para estruturar seções e conteúdo.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+> **Estado do projeto:** os botões dos banners são atualmente visuais. Cadastro, busca, filtros, modais e integração com uma API ainda não estão implementados.
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+## 🧰 Tecnologias
 
-## Expanding the ESLint configuration
+- [React 19](https://react.dev/) e [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/) para desenvolvimento e build
+- [Tailwind CSS 4](https://tailwindcss.com/) e CSS Modules
+- [Lucide React](https://lucide.dev/) para ícones
+- ESLint para análise estática
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Começando
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Pré-requisitos
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js
+- npm
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Instalação
 
+Clone o repositório e instale as dependências:
+
+```bash
+git clone https://github.com/sararrmuniz/encontra_pets_react.git
+cd encontra_pets_react/encontra-pets
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Inicie o servidor de desenvolvimento:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run dev
 ```
+
+O Vite mostrará no terminal o endereço local para abrir no navegador.
+
+## 📜 Comandos disponíveis
+
+| Comando | Descrição |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento com atualização em tempo real. |
+| `npm run build` | Verifica os tipos TypeScript e gera a versão de produção em `dist/`. |
+| `npm run preview` | Serve localmente a versão de produção gerada. |
+| `npm run lint` | Executa o ESLint no projeto. |
+
+## 📁 Estrutura do projeto
+
+```text
+src/
+├── assets/                  # Imagens e recursos estáticos
+├── components/
+│   ├── BannerCarousel/      # Banners, controles e estilos do carrossel
+│   ├── Container/           # Wrapper reutilizável para conteúdo
+│   ├── Header/              # Cabeçalho e navegação responsiva
+│   └── Section/             # Estrutura e espaçamento das seções
+├── styles/
+│   ├── globals.css          # Tailwind, tema e estilos globais
+│   └── App.css
+├── App.tsx                  # Composição principal da página
+└── main.tsx                 # Inicialização do React
+```
+
+O alias `@/` aponta para `src/`; por exemplo, `@/components/Header` importa um componente de `src/components/Header`.
+
+## 🎨 Personalização
+
+- Os textos, imagens, temas e ações dos banners estão definidos em `src/components/BannerCarousel/index.tsx`.
+- O visual do carrossel fica em `src/components/BannerCarousel/styles.module.css`.
+- As cores de marca e as fontes do tema global estão configuradas em `src/styles/globals.css`.
+- A estrutura da página inicial é montada em `src/App.tsx`.
+
+As imagens dos banners são carregadas do Unsplash e as fontes são servidas pelo Google Fonts; ambos precisam de conexão à internet para carregar externamente.
+
+## 🛣️ Próximos passos possíveis
+
+- Implementar as ações de busca, cadastro e filtros dos banners.
+- Criar páginas ou formulários para pets para adoção, perdidos e encontrados.
+- Integrar os fluxos a uma API e persistir os anúncios.
+- Completar os destinos de navegação das seções da página.
+
+---
+
+Feito com cuidado por animais e por quem acredita que todo pet merece ser encontrado. 💛
