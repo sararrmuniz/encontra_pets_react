@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { PetCard,type  PetCardProps } from './PetCard';
+import { useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { PetCard, type PetCardProps } from './PetCard';
 import { PetModal } from './PetModal';
+import styles from './styles.module.css';
 
 // Exportamos a interface para uso compartilhado
 export interface PetItem extends PetCardProps {
@@ -82,6 +84,24 @@ const PETS_MOCK: PetItem[] = [
     },
     genderBadgeBg: 'bg-amber-100 text-amber-900',
   },
+  {
+    id: 5,
+    name: 'Luna',
+    type: 'cat',
+    status: 'adoption',
+    breed: 'Angorá Mix',
+    gender: 'Fêmea',
+    location: 'Bairro Tibery, Uberlândia',
+    image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=600',
+    description: 'Muito calma, castrada e amigável com outros gatos. Procura uma família amorosa.',
+    statusBadge: { label: 'Adoção', bgColor: 'bg-amber-600' },
+    actionButton: {
+      text: 'Quero Conhecer',
+      bgColor: 'bg-amber-50 hover:bg-amber-100',
+      textColor: 'text-amber-950',
+    },
+    genderBadgeBg: 'bg-amber-100 text-amber-900',
+  },
 ];
 
 type FilterCategory = 'all' | 'adoption' | 'lost' | 'found';
@@ -89,6 +109,7 @@ type FilterCategory = 'all' | 'adoption' | 'lost' | 'found';
 export function PetSection() {
   const [activeFilter, setActiveFilter] = useState<FilterCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const carouselRef = useRef<HTMLDivElement>(null);
   
   // Estado que armazena o pet selecionado para abrir a modal
   const [selectedPet, setSelectedPet] = useState<PetItem | null>(null);
@@ -103,13 +124,23 @@ export function PetSection() {
     return matchesCategory && matchesSearch;
   });
 
+  const scrollCarousel = (direction: 'previous' | 'next') => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollBy({
+      left: direction === 'next' ? carousel.clientWidth : -carousel.clientWidth,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <section className="py-8 relative">
       {/* Cabeçalho e Pesquisa */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-2xl font-bold text-amber-950 font-display">
-            Mural de Animais
+            Animais Cadastrados
           </h2>
           <p className="text-sm text-amber-800/70">
             Encontre o seu próximo amigo ou ajude um pet a voltar para casa.
@@ -171,26 +202,72 @@ export function PetSection() {
         </button>
       </div>
 
-      {/* Grid de Cards */}
+      {/* Lista de cards */}
       {filteredPets.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredPets.map((pet) => (
-            <PetCard
-              key={pet.id}
-              name={pet.name}
-              breed={pet.breed}
-              gender={pet.gender}
-              location={pet.location}
-              image={pet.image}
-              description={pet.description}
-              statusBadge={pet.statusBadge}
-              actionButton={pet.actionButton}
-              genderBadgeBg={pet.genderBadgeBg}
-              // Ao clicar no botão do card, definimos o pet ativo para abrir a modal
-              onActionClick={() => setSelectedPet(pet)}
-            />
-          ))}
-        </div>
+        filteredPets.length > 4 ? (
+          <div>
+            <div className="flex justify-end gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => scrollCarousel('previous')}
+                aria-label="Ver animais anteriores"
+                className="p-2 rounded-full border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
+              >
+                <ChevronLeft size={20} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollCarousel('next')}
+                aria-label="Ver próximos animais"
+                className="p-2 rounded-full border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
+              >
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+            </div>
+            <div
+              ref={carouselRef}
+              className={styles.carouselTrack}
+              role="region"
+              aria-label="Animais cadastrados"
+              aria-roledescription="carrossel"
+            >
+              {filteredPets.map((pet) => (
+                <div key={pet.id} className={styles.carouselCard}>
+                  <PetCard
+                    name={pet.name}
+                    breed={pet.breed}
+                    gender={pet.gender}
+                    location={pet.location}
+                    image={pet.image}
+                    description={pet.description}
+                    statusBadge={pet.statusBadge}
+                    actionButton={pet.actionButton}
+                    genderBadgeBg={pet.genderBadgeBg}
+                    onActionClick={() => setSelectedPet(pet)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredPets.map((pet) => (
+              <PetCard
+                key={pet.id}
+                name={pet.name}
+                breed={pet.breed}
+                gender={pet.gender}
+                location={pet.location}
+                image={pet.image}
+                description={pet.description}
+                statusBadge={pet.statusBadge}
+                actionButton={pet.actionButton}
+                genderBadgeBg={pet.genderBadgeBg}
+                onActionClick={() => setSelectedPet(pet)}
+              />
+            ))}
+          </div>
+        )
       ) : (
         <div className="text-center py-12 bg-amber-50/50 rounded-2xl border border-dashed border-amber-200">
           <p className="text-amber-900 font-medium">
