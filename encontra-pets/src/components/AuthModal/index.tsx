@@ -49,7 +49,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {mode === 'login' ? 'Entrar na Conta' : 'Criar Conta'}
             </h2>
           </div>
-          <p className="text-xs text-amber-800/70 mt-1">
+          <p className="text-sm text-amber-800/70 mt-1">
             {mode === 'login'
               ? 'Acesse sua conta para gerenciar seus pets'
               : 'Crie sua conta para cadastrar pets e ajudar a comunidade'}
@@ -59,7 +59,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="flex bg-amber-100/60 p-1 rounded-xl mt-6">
             <button
               onClick={() => setMode('login')}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
                 mode === 'login'
                   ? 'bg-white text-amber-950 shadow-sm'
                   : 'text-amber-900/70 hover:text-amber-950'
@@ -69,7 +69,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </button>
             <button
               onClick={() => setMode('register')}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
                 mode === 'register'
                   ? 'bg-white text-amber-950 shadow-sm'
                   : 'text-amber-900/70 hover:text-amber-950'
@@ -85,7 +85,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           {mode === 'register' && (
             <>
               <div>
-                <label className="block text-xs font-bold text-amber-900 mb-1">
+                <label className="block text-sm font-bold text-amber-900 mb-1">
                   Nome Completo
                 </label>
                 <input
@@ -99,7 +99,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-amber-900 mb-1">
+                <label className="block text-sm font-bold text-amber-900 mb-1">
                   Telefone / WhatsApp
                 </label>
                 <input
@@ -115,7 +115,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           )}
 
           <div>
-            <label className="block text-xs font-bold text-amber-900 mb-1">
+            <label className="block text-sm font-bold text-amber-900 mb-1">
               E-mail
             </label>
             <input
@@ -129,7 +129,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-amber-900 mb-1">
+            <label className="block text-sm font-bold text-amber-900 mb-1">
               Senha
             </label>
             <input

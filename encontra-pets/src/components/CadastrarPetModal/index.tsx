@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type PetItem } from '../PetSection';
+import { PawPrint } from 'lucide-react';
 
 interface CadastrarPetModalProps {
   isOpen: boolean;
@@ -91,10 +92,13 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
         {/* Cabeçalho */}
         <div className="p-6 pb-2 border-b border-amber-900/10">
-          <h2 className="text-2xl font-bold text-amber-950 font-display">
+        <div className="flex items-center justify-center gap-2 mb-2">
+            <PawPrint className="h-6 w-6 text-amber-600" />
+            <h2 className="text-2xl font-bold text-amber-950 font-display">
             Cadastrar Novo Pet
           </h2>
-          <p className="text-xs text-amber-800/70 mt-1">
+        </div>
+          <p className="text-sm text-center text-amber-800/70 mt-1">
             Preencha os dados do animal para publicar o anúncio no mural.
           </p>
         </div>
@@ -105,7 +109,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
           {/* Nome e Espécie */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Nome do Pet
               </label>
               <input
@@ -119,7 +123,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Tipo de Animal
               </label>
               <select
@@ -136,7 +140,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
           {/* Status e Gênero */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Situação / Anúncio
               </label>
               <select
@@ -151,7 +155,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Gênero
               </label>
               <select
@@ -168,7 +172,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
           {/* Raça e Localização */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Raça
               </label>
               <input
@@ -181,7 +185,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-900 mb-1">
+              <label className="block text-sm font-bold text-amber-900 mb-1">
                 Localização / Bairro
               </label>
               <input
@@ -197,7 +201,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
           {/* URL da Foto */}
           <div>
-            <label className="block text-xs font-bold text-amber-900 mb-1">
+            <label className="block text-sm font-bold text-amber-900 mb-1">
               URL da Imagem / Foto
             </label>
             <input
@@ -211,7 +215,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
           {/* Descrição */}
           <div>
-            <label className="block text-xs font-bold text-amber-900 mb-1">
+            <label className="block text-sm font-bold text-amber-900 mb-1">
               Descrição / Detalhes
             </label>
             <textarea

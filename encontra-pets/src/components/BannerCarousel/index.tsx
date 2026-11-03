@@ -16,6 +16,7 @@ interface BannerAction {
   label: string;
   icon?: LucideIcon;
   variant: 'primary' | 'secondary';
+  opensPetRegistration?: boolean;
 }
 
 interface BannerSlide {
@@ -55,7 +56,7 @@ const BANNERS: BannerSlide[] = [
     imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=1200',
     imageAlt: 'Gato esperando por seu tutor',
     actions: [
-      { label: 'Cadastrar Pet Perdido', icon: Megaphone, variant: 'primary' },
+      { label: 'Cadastrar Pet Perdido', icon: Megaphone, variant: 'primary', opensPetRegistration: true },
       { label: 'Buscar Pets Perdidos', variant: 'secondary' },
     ],
   },
@@ -69,12 +70,16 @@ const BANNERS: BannerSlide[] = [
     imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=1200',
     imageAlt: 'Cão resgatado',
     actions: [
-      { label: 'Registrar Pet Encontrado', icon: MapPin, variant: 'primary' },
+      { label: 'Registrar Pet Encontrado', icon: MapPin, variant: 'primary', opensPetRegistration: true },
     ],
   },
 ];
 
-export function BannerCarousel() {
+interface BannerCarouselProps {
+  onOpenCadastrarPet: () => void;
+}
+
+export function BannerCarousel({ onOpenCadastrarPet }: BannerCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -123,6 +128,7 @@ export function BannerCarousel() {
                   <button
                     key={action.label}
                     type="button"
+                    onClick={action.opensPetRegistration ? onOpenCadastrarPet : undefined}
                     className={`${styles.actionBtn} ${
                       action.variant === 'primary'
                         ? `${styles.actionBtn_primary} ${styles[`actionBtn_${banner.theme}`]}`

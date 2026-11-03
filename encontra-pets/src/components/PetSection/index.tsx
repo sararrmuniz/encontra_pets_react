@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PetCard, type PetCardProps } from './PetCard';
 import { PetModal } from './PetModal';
+import { CadastrarPetModal } from '../CadastrarPetModal';
 import styles from './styles.module.css';
 
 // Exportamos a interface para uso compartilhado
@@ -106,15 +107,24 @@ const PETS_MOCK: PetItem[] = [
 
 type FilterCategory = 'all' | 'adoption' | 'lost' | 'found';
 
-export function PetSection() {
+interface PetSectionProps {
+  isCadastrarPetModalOpen: boolean;
+  onCloseCadastrarPet: () => void;
+}
+
+export function PetSection({
+  isCadastrarPetModalOpen,
+  onCloseCadastrarPet,
+}: PetSectionProps) {
   const [activeFilter, setActiveFilter] = useState<FilterCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [pets, setPets] = useState(PETS_MOCK);
   const carouselRef = useRef<HTMLDivElement>(null);
   
   // Estado que armazena o pet selecionado para abrir a modal
   const [selectedPet, setSelectedPet] = useState<PetItem | null>(null);
 
-  const filteredPets = PETS_MOCK.filter((pet) => {
+  const filteredPets = pets.filter((pet) => {
     const matchesCategory = activeFilter === 'all' || pet.status === activeFilter;
     const matchesSearch =
       pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -278,6 +288,11 @@ export function PetSection() {
 
       {/* Renderização condicional da Modal */}
       <PetModal pet={selectedPet} onClose={() => setSelectedPet(null)} />
+      <CadastrarPetModal
+        isOpen={isCadastrarPetModalOpen}
+        onClose={onCloseCadastrarPet}
+        onAddPet={(newPet) => setPets(currentPets => [newPet, ...currentPets])}
+      />
     </section>
   );
 }

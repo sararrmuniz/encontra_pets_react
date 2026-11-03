@@ -9,10 +9,14 @@ import { PetSection } from './components/PetSection'
 
 export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isCadastrarPetModalOpen, setIsCadastrarPetModalOpen] = useState(false)
 
   return (
     <>
-      <Header onOpenAuth={() => setIsAuthModalOpen(true)} />
+      <Header
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenCadastrarPet={() => setIsCadastrarPetModalOpen(true)}
+      />
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
@@ -21,12 +25,17 @@ export default function App() {
       <main>
         <Section>
           <Container>
-            <BannerCarousel />
+            <BannerCarousel
+              onOpenCadastrarPet={() => setIsCadastrarPetModalOpen(true)}
+            />
           </Container>
         </Section>
         <Section>
           <Container>
-            <PetSection />
+            <PetSection
+              isCadastrarPetModalOpen={isCadastrarPetModalOpen}
+              onCloseCadastrarPet={() => setIsCadastrarPetModalOpen(false)}
+            />
           </Container>
         </Section>
       </main>

@@ -3,9 +3,10 @@ import { Menu, PawPrint, X } from 'lucide-react'
 
 interface HeaderProps {
     onOpenAuth: () => void
+    onOpenCadastrarPet: () => void
 }
 
-export function Header({ onOpenAuth }: HeaderProps) {
+export function Header({ onOpenAuth, onOpenCadastrarPet }: HeaderProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     return (
@@ -37,6 +38,7 @@ export function Header({ onOpenAuth }: HeaderProps) {
                     <div className="flex items-center gap-4">
                         <button
                             type="button"
+                            onClick={onOpenCadastrarPet}
                             className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer text-sm transition-all shadow-sm"
                         >
                             + Cadastrar Pet
@@ -96,6 +98,10 @@ export function Header({ onOpenAuth }: HeaderProps) {
                 <div className="flex flex-col gap-3 pt-2">
                     <button
                         type="button"
+                        onClick={() => {
+                            setIsMobileMenuOpen(false)
+                            onOpenCadastrarPet()
+                        }}
                         className="w-full px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm transition-all shadow-sm"
                     >
                         + Cadastrar Pet

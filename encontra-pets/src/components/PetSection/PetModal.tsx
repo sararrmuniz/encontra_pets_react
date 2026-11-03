@@ -57,7 +57,7 @@ export function PetModal({ pet, onClose }: PetModalProps) {
           </div>
 
           {/* Localização */}
-          <p className="text-xs font-medium text-amber-800/70 flex items-center gap-1 mb-4">
+          <p className="text-sm font-medium text-amber-800/70 flex items-center gap-1 mb-4">
             <span>📍</span> {pet.location}
           </p>
 
