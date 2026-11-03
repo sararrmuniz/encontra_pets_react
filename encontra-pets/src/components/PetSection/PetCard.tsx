@@ -70,7 +70,7 @@ export function PetCard({
         {/* Botão de Ação Dinâmico */}
         <button
           onClick={onActionClick}
-          className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all hover:opacity-90 shadow-sm ${actionButton.bgColor} ${actionButton.textColor}`}
+          className={`w-full py-2.5 px-4 rounded-xl cursor-pointer font-bold text-sm transition-all hover:opacity-90 shadow-sm ${actionButton.bgColor} ${actionButton.textColor}`}
         >
           {actionButton.text}
         </button>

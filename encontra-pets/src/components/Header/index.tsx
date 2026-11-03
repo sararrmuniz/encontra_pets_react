@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { Menu, PawPrint, X } from 'lucide-react'
 
-export function Header() {
+interface HeaderProps {
+    onOpenAuth: () => void
+}
+
+export function Header({ onOpenAuth }: HeaderProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     return (
@@ -30,6 +34,21 @@ export function Header() {
                     <a href="#contato" className="transition hover:text-brand-600">
                         Contact
                     </a>
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer text-sm transition-all shadow-sm"
+                        >
+                            + Cadastrar Pet
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onOpenAuth}
+                            className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold cursor-pointer text-sm transition-all"
+                        >
+                            Entrar
+                        </button>
+                    </div>
                 </nav>
 
                 <button
@@ -74,6 +93,24 @@ export function Header() {
                 >
                     Contact
                 </a>
+                <div className="flex flex-col gap-3 pt-2">
+                    <button
+                        type="button"
+                        className="w-full px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm transition-all shadow-sm"
+                    >
+                        + Cadastrar Pet
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsMobileMenuOpen(false)
+                            onOpenAuth()
+                        }}
+                        className="w-full px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-sm transition-all"
+                    >
+                        Entrar
+                    </button>
+                </div>
             </nav>
         </header>
     )
