@@ -7,7 +7,7 @@ import styles from './styles.module.css';
 
 // Exportamos a interface para uso compartilhado
 export interface PetItem extends PetCardProps {
-  id: number;
+  id: number | string;
   type: 'dog' | 'cat';
   status: 'adoption' | 'lost' | 'found';
 }

@@ -1,13 +1,33 @@
 import { useState } from 'react'
-import { Menu, PawPrint, X } from 'lucide-react'
+import { Menu, PawPrint, UserRoundCheck, X } from 'lucide-react'
 
 interface HeaderProps {
     onOpenAuth: () => void
     onOpenCadastrarPet: () => void
+    isAuthenticated: boolean
+    userName: string | null
+    onSignOut: () => Promise<void>
 }
 
-export function Header({ onOpenAuth, onOpenCadastrarPet }: HeaderProps) {
+export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userName, onSignOut }: HeaderProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isSigningOut, setIsSigningOut] = useState(false)
+    const [signOutError, setSignOutError] = useState('')
+
+    const handleSignOut = async () => {
+        setIsSigningOut(true)
+        setSignOutError('')
+        try {
+            await onSignOut()
+            setIsMobileMenuOpen(false)
+        } catch (error) {
+            setSignOutError(
+                error instanceof Error ? error.message : 'Não foi possível sair da conta.',
+            )
+        } finally {
+            setIsSigningOut(false)
+        }
+    }
 
     return (
         <header className="sticky top-0 z-40 border-b border-amber-100/60 bg-brand-header shadow-sm">
@@ -43,15 +63,37 @@ export function Header({ onOpenAuth, onOpenCadastrarPet }: HeaderProps) {
                         >
                             + Cadastrar Pet
                         </button>
-                        <button
-                            type="button"
-                            onClick={onOpenAuth}
-                            className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold cursor-pointer text-sm transition-all"
-                        >
-                            Entrar
-                        </button>
+                        {isAuthenticated ? (
+                            <>
+                                <span className="inline-flex max-w-64 items-center gap-2 truncate text-sm font-semibold text-amber-950">
+                                    <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
+                                    {userName ? `Olá, ${userName}!` : 'Olá!'}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={handleSignOut}
+                                    disabled={isSigningOut}
+                                    className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold cursor-pointer text-sm transition-all disabled:opacity-60"
+                                >
+                                    {isSigningOut ? 'Saindo...' : 'Sair'}
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={onOpenAuth}
+                                className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold cursor-pointer text-sm transition-all"
+                            >
+                                Entrar
+                            </button>
+                        )}
                     </div>
                 </nav>
+                {signOutError && (
+                    <p role="alert" className="hidden text-right text-sm text-red-700 md:block">
+                        {signOutError}
+                    </p>
+                )}
 
                 <button
                     type="button"
@@ -106,17 +148,39 @@ export function Header({ onOpenAuth, onOpenCadastrarPet }: HeaderProps) {
                     >
                         + Cadastrar Pet
                     </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsMobileMenuOpen(false)
-                            onOpenAuth()
-                        }}
-                        className="w-full px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-sm transition-all"
-                    >
-                        Entrar
-                    </button>
+                    {isAuthenticated ? (
+                        <>
+                            <p className="flex items-center gap-2 text-sm font-semibold text-amber-950">
+                                <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
+                                {userName ? `Olá, ${userName}!` : 'Olá!'}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={handleSignOut}
+                                disabled={isSigningOut}
+                                className="w-full px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-sm transition-all disabled:opacity-60"
+                            >
+                                {isSigningOut ? 'Saindo...' : 'Sair'}
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsMobileMenuOpen(false)
+                                onOpenAuth()
+                            }}
+                            className="w-full px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-sm transition-all"
+                        >
+                            Entrar
+                        </button>
+                    )}
                 </div>
+                {signOutError && (
+                    <p role="alert" className="pt-2 text-sm text-red-700">
+                        {signOutError}
+                    </p>
+                )}
             </nav>
         </header>
     )

@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { type PetItem } from '../PetSection';
 import { PawPrint } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+const DEFAULT_PET_IMAGE =
+  'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600';
 
 interface CadastrarPetModalProps {
   isOpen: boolean;
@@ -17,13 +21,16 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
   const [location, setLocation] = useState('');
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage('');
 
-    // Definição das configurações visuais do badge e botão com base no status selecionado
     let statusBadge = { label: 'Adoção', bgColor: 'bg-amber-600' };
     let actionButton = {
       text: 'Quero Conhecer',
@@ -50,32 +57,78 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
       genderBadgeBg = 'bg-cyan-50 text-cyan-800';
     }
 
-    // Criação do novo objeto do pet
-    const newPet: PetItem = {
-      id: Date.now(), // Gera um ID temporário único
-      name,
-      type,
-      status,
-      breed: breed || 'SRD',
-      gender,
-      location,
-      image: image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600', // Imagem padrão caso não fornecida
-      description,
-      statusBadge,
-      actionButton,
-      genderBadgeBg,
-    };
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session) {
+        setErrorMessage('Usuário não identificado, por favor faça login!');
+        return;
+      }
 
-    onAddPet(newPet);
-    alert('Pet cadastrado com sucesso!');
-    onClose();
-    
-    // Limpeza do formulário
-    setName('');
-    setBreed('');
-    setLocation('');
-    setImage('');
-    setDescription('');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (!user) {
+        if (userError) throw userError;
+        setErrorMessage('Usuário não identificado, por favor faça login!');
+        return;
+      }
+      if (userError) throw userError;
+
+      const { data, error } = await supabase
+        .from('pets')
+        .insert({
+          owner_id: user.id,
+          name: name.trim(),
+          species: type,
+          status,
+          breed: breed.trim() || 'SRD',
+          gender,
+          location: location.trim(),
+          image_url: image.trim() || null,
+          description: description.trim(),
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      const newPet: PetItem = {
+        id: data.id,
+        name: name.trim(),
+        type,
+        status,
+        breed: breed.trim() || 'SRD',
+        gender,
+        location: location.trim(),
+        image: image.trim() || DEFAULT_PET_IMAGE,
+        description: description.trim(),
+        statusBadge,
+        actionButton,
+        genderBadgeBg,
+      };
+
+      onAddPet(newPet);
+      setName('');
+      setType('dog');
+      setStatus('adoption');
+      setGender('Macho');
+      setBreed('');
+      setLocation('');
+      setImage('');
+      setDescription('');
+      onClose();
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Auth session missing!') {
+        setErrorMessage('Usuário não identificado, por favor faça login!');
+        return;
+      }
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível cadastrar o pet. Tente novamente.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -84,8 +137,10 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
         
         {/* Botão Fechar */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 transition-colors"
+          disabled={isSubmitting}
+          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 transition-colors disabled:opacity-50"
         >
           ✕
         </button>
@@ -105,6 +160,11 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="p-6 max-h-[75vh] overflow-y-auto space-y-4">
+          {errorMessage && (
+            <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </p>
+          )}
           
           {/* Nome e Espécie */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -230,9 +290,10 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
           <button
             type="submit"
-            className="w-full py-3.5 px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-4"
+            disabled={isSubmitting}
+            className="w-full py-3.5 px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-4 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Publicar Anúncio
+            {isSubmitting ? 'Publicando...' : 'Publicar Anúncio'}
           </button>
         </form>
       </div>
