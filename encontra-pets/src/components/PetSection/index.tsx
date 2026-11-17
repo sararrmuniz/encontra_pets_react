@@ -106,6 +106,7 @@ export function PetSection({
         const { data, error } = await supabase
           .from('pets')
           .select('id, name, species, status, breed, gender, location, image_url, description')
+          .is('resolved_at', null)
           .order('created_at', { ascending: false });
 
         if (!isActive) return;

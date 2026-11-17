@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Menu, PawPrint, UserRoundCheck, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface HeaderProps {
     onOpenAuth: () => void
@@ -32,7 +33,7 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
     return (
         <header className="sticky top-0 z-40 border-b border-amber-100/60 bg-brand-header shadow-sm">
             <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                <a href="#home" className="group flex items-center gap-3" aria-label="Encontra Pets — início">
+                <Link to="/" className="group flex items-center gap-3" aria-label="Encontra Pets — início">
                     <span className="flex items-center font-display text-3xl font-extrabold tracking-tight text-brand-500 sm:text-4xl">
                         Encontra
                         <span className="ml-0.5 flex items-center gap-1 text-brand-700">
@@ -40,15 +41,15 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                             Pets
                         </span>
                     </span>
-                </a>
+                </Link>
 
                 <nav
                     aria-label="Navegação principal"
                     className="hidden items-center space-x-8 text-lg font-medium text-gray-700 md:flex"
                 >
-                    <a href="#home" className="font-semibold text-brand-600 transition hover:text-brand-700">
+                    <Link to="/" className="font-semibold text-brand-600 transition hover:text-brand-700">
                         Home
-                    </a>
+                    </Link>
                     <a href="#sobre" className="transition hover:text-brand-600">
                         About
                     </a>
@@ -65,6 +66,12 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                         </button>
                         {isAuthenticated ? (
                             <>
+                                <Link
+                                    to="/perfil"
+                                    className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold text-sm transition-all"
+                                >
+                                    Meu perfil
+                                </Link>
                                 <span className="inline-flex max-w-64 items-center gap-2 truncate text-sm font-semibold text-amber-950">
                                     <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
                                     {userName ? `Olá, ${userName}!` : 'Olá!'}
@@ -116,13 +123,13 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                 aria-label="Navegação móvel"
                 className={`${isMobileMenuOpen ? 'block' : 'hidden'} space-y-3 border-t border-amber-200/50 bg-brand-header px-4 pt-3 pb-5 md:hidden`}
             >
-                <a
-                    href="#home"
+                <Link
+                    to="/"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block text-lg font-semibold text-brand-600"
                 >
                     Home
-                </a>
+                </Link>
                 <a
                     href="#sobre"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -139,10 +146,19 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                 </a>
                 <div className="flex flex-col gap-3 pt-2">
                     {isAuthenticated && (
-                        <p className="flex items-center gap-2 pb-1 text-sm font-semibold text-amber-950">
-                            <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
-                            {userName ? `Olá, ${userName}!` : 'Olá!'}
-                        </p>
+                        <>
+                            <p className="flex items-center gap-2 pb-1 text-sm font-semibold text-amber-950">
+                                <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
+                                {userName ? `Olá, ${userName}!` : 'Olá!'}
+                            </p>
+                            <Link
+                                to="/perfil"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block w-full rounded-xl bg-amber-100 px-4 py-2 text-center text-sm font-bold text-amber-950 transition-all hover:bg-amber-200"
+                            >
+                                Meu perfil
+                            </Link>
+                        </>
                     )}
                     <button
                         type="button"
