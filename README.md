@@ -11,8 +11,10 @@ O projeto está sendo construído com foco em uma experiência acolhedora, respo
 - **Controles do carrossel** para avançar, voltar ou selecionar um slide; a rotação automática pausa quando o cursor está sobre o banner.
 - **Layout adaptável** para diferentes larguras de tela.
 - **Componentes reutilizáveis** para estruturar seções e conteúdo.
+- **Autenticação e persistência** com Supabase para usuários e anúncios de pets.
+- **Perfil do usuário** para editar dados pessoais e gerenciar os próprios anúncios.
 
-> **Estado do projeto:** os botões dos banners são atualmente visuais. Cadastro, busca, filtros, modais e integração com uma API ainda não estão implementados.
+> **Estado do projeto:** os botões dos banners são atualmente visuais. A edição de perfil e anúncios utiliza as políticas de acesso configuradas no Supabase.
 
 ## 🧰 Tecnologias
 
@@ -20,6 +22,8 @@ O projeto está sendo construído com foco em uma experiência acolhedora, respo
 - [Vite](https://vite.dev/) para desenvolvimento e build
 - [Tailwind CSS 4](https://tailwindcss.com/) e CSS Modules
 - [Lucide React](https://lucide.dev/) para ícones
+- [Supabase](https://supabase.com/) para autenticação e banco de dados
+- [React Router](https://reactrouter.com/) para navegação entre páginas
 - ESLint para análise estática
 
 ## 🚀 Começando
@@ -47,6 +51,16 @@ npm run dev
 
 O Vite mostrará no terminal o endereço local para abrir no navegador.
 
+### Banco de dados
+
+Para habilitar a marcação de anúncios como resolvidos, execute o SQL de
+[`supabase/migrations/20261117110000_add_pet_resolution.sql`](./supabase/migrations/20261117110000_add_pet_resolution.sql)
+no SQL Editor do projeto Supabase. O projeto também precisa das políticas RLS
+que permitem a cada usuário ler e editar apenas o próprio perfil e os próprios
+anúncios; a leitura pública dos anúncios ativos deve continuar habilitada.
+Ao publicar a aplicação, configure o host para direcionar rotas desconhecidas
+para `index.html`, permitindo abrir diretamente a rota `/perfil`.
+
 ## 📜 Comandos disponíveis
 
 | Comando | Descrição |
@@ -69,9 +83,13 @@ src/
 ├── styles/
 │   ├── globals.css          # Tailwind, tema e estilos globais
 │   └── App.css
-├── App.tsx                  # Composição principal da página
+├── pages/
+│   └── ProfilePage.tsx      # Edição do perfil e gerenciamento dos anúncios
+├── App.tsx                  # Rotas e composição principal da aplicação
 └── main.tsx                 # Inicialização do React
 ```
+
+As alterações do banco de dados ficam em `supabase/migrations/`.
 
 O alias `@/` aponta para `src/`; por exemplo, `@/components/Header` importa um componente de `src/components/Header`.
 
@@ -86,9 +104,8 @@ As imagens dos banners são carregadas do Unsplash e as fontes são servidas pel
 
 ## 🛣️ Próximos passos possíveis
 
-- Implementar as ações de busca, cadastro e filtros dos banners.
-- Criar páginas ou formulários para pets para adoção, perdidos e encontrados.
-- Integrar os fluxos a uma API e persistir os anúncios.
+- Implementar as ações de busca e os filtros dos banners.
+- Permitir upload de imagens para os anúncios.
 - Completar os destinos de navegação das seções da página.
 
 ---
