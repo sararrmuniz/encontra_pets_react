@@ -138,6 +138,12 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                     Contact
                 </a>
                 <div className="flex flex-col gap-3 pt-2">
+                    {isAuthenticated && (
+                        <p className="flex items-center gap-2 pb-1 text-sm font-semibold text-amber-950">
+                            <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
+                            {userName ? `Olá, ${userName}!` : 'Olá!'}
+                        </p>
+                    )}
                     <button
                         type="button"
                         onClick={() => {
@@ -150,10 +156,6 @@ export function Header({ onOpenAuth, onOpenCadastrarPet, isAuthenticated, userNa
                     </button>
                     {isAuthenticated ? (
                         <>
-                            <p className="flex items-center gap-2 text-sm font-semibold text-amber-950">
-                                <UserRoundCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-green-700" />
-                                {userName ? `Olá, ${userName}!` : 'Olá!'}
-                            </p>
                             <button
                                 type="button"
                                 onClick={handleSignOut}

@@ -1,9 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PetCard, type PetCardProps } from './PetCard';
 import { PetModal } from './PetModal';
 import { CadastrarPetModal } from '../CadastrarPetModal';
 import styles from './styles.module.css';
+import { supabase } from '@/lib/supabase';
+
+const DEFAULT_PET_IMAGE =
+  'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600';
 
 // Exportamos a interface para uso compartilhado
 export interface PetItem extends PetCardProps {
@@ -12,98 +16,62 @@ export interface PetItem extends PetCardProps {
   status: 'adoption' | 'lost' | 'found';
 }
 
-const PETS_MOCK: PetItem[] = [
-  {
-    id: 1,
-    name: 'Mel',
-    type: 'dog',
-    status: 'adoption',
-    breed: 'Bulldog Francês',
-    gender: 'Fêmea',
-    location: 'Uberlândia, MG',
-    image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=600',
-    description: 'Cão Golden Mix - 1 ano • Já castrada, vacinada e vermifugada. Muito carinhosa!',
-    statusBadge: { label: 'Adoção', bgColor: 'bg-amber-600' },
-    actionButton: {
-      text: 'Quero Conhecer',
-      bgColor: 'bg-amber-50 hover:bg-amber-100',
-      textColor: 'text-amber-950',
+interface PetDatabaseRecord {
+  id: string;
+  name: string;
+  species: 'dog' | 'cat';
+  status: 'adoption' | 'lost' | 'found';
+  breed: string;
+  gender: 'Macho' | 'Fêmea';
+  location: string;
+  image_url: string | null;
+  description: string;
+}
+
+function mapDatabasePet(pet: PetDatabaseRecord): PetItem {
+  const appearance = {
+    adoption: {
+      statusBadge: { label: 'Adoção', bgColor: 'bg-amber-600' },
+      actionButton: {
+        text: 'Quero Conhecer',
+        bgColor: 'bg-amber-50 hover:bg-amber-100',
+        textColor: 'text-amber-950',
+      },
+      genderBadgeBg: 'bg-amber-100 text-amber-900',
     },
-    genderBadgeBg: 'bg-amber-100 text-amber-900',
-  },
-  {
-    id: 2,
-    name: 'Bob',
-    type: 'dog',
-    status: 'lost',
-    breed: 'Pug',
-    gender: 'Macho',
-    location: 'Bairro Santa Mônica',
-    image: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=600',
-    description: 'Sumiu na tarde de ontem perto da praça. Estava usando coleira azul e é muito dócil.',
-    statusBadge: { label: 'Perdido', bgColor: 'bg-red-600' },
-    actionButton: {
-      text: 'Ver Informações',
-      bgColor: 'bg-red-50 hover:bg-red-100',
-      textColor: 'text-red-700',
+    lost: {
+      statusBadge: { label: 'Perdido', bgColor: 'bg-red-600' },
+      actionButton: {
+        text: 'Ver Informações',
+        bgColor: 'bg-red-50 hover:bg-red-100',
+        textColor: 'text-red-700',
+      },
+      genderBadgeBg: 'bg-red-50 text-red-700',
     },
-    genderBadgeBg: 'bg-red-50 text-red-700',
-  },
-  {
-    id: 3,
-    name: 'Gatinho SRD',
-    type: 'cat',
-    status: 'found',
-    breed: 'SRD',
-    gender: 'Macho',
-    location: 'Centro, Uberlândia',
-    image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=600',
-    description: 'Encontrado próximo à rotatória. Está seguro em abrigo temporário aguardando o dono.',
-    statusBadge: { label: 'Encontrado', bgColor: 'bg-cyan-600' },
-    actionButton: {
-      text: 'Reconhece este Pet?',
-      bgColor: 'bg-cyan-50 hover:bg-cyan-100',
-      textColor: 'text-cyan-800',
+    found: {
+      statusBadge: { label: 'Encontrado', bgColor: 'bg-cyan-600' },
+      actionButton: {
+        text: 'Reconhece este Pet?',
+        bgColor: 'bg-cyan-50 hover:bg-cyan-100',
+        textColor: 'text-cyan-800',
+      },
+      genderBadgeBg: 'bg-cyan-50 text-cyan-800',
     },
-    genderBadgeBg: 'bg-cyan-50 text-cyan-800',
-  },
-  {
-    id: 4,
-    name: 'Thor',
-    type: 'dog',
-    status: 'adoption',
-    breed: 'Corgi',
-    gender: 'Macho',
-    location: 'Uberlândia, MG',
-    image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600',
-    description: 'Porte médio, muito ativo e protetor. Ideal para casas com quintal espaçoso.',
-    statusBadge: { label: 'Adoção', bgColor: 'bg-amber-600' },
-    actionButton: {
-      text: 'Quero Conhecer',
-      bgColor: 'bg-amber-50 hover:bg-amber-100',
-      textColor: 'text-amber-950',
-    },
-    genderBadgeBg: 'bg-amber-100 text-amber-900',
-  },
-  {
-    id: 5,
-    name: 'Luna',
-    type: 'cat',
-    status: 'adoption',
-    breed: 'Angorá Mix',
-    gender: 'Fêmea',
-    location: 'Bairro Tibery, Uberlândia',
-    image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=600',
-    description: 'Muito calma, castrada e amigável com outros gatos. Procura uma família amorosa.',
-    statusBadge: { label: 'Adoção', bgColor: 'bg-amber-600' },
-    actionButton: {
-      text: 'Quero Conhecer',
-      bgColor: 'bg-amber-50 hover:bg-amber-100',
-      textColor: 'text-amber-950',
-    },
-    genderBadgeBg: 'bg-amber-100 text-amber-900',
-  },
-];
+  }[pet.status];
+
+  return {
+    id: pet.id,
+    name: pet.name,
+    type: pet.species,
+    status: pet.status,
+    breed: pet.breed,
+    gender: pet.gender,
+    location: pet.location,
+    image: pet.image_url || DEFAULT_PET_IMAGE,
+    description: pet.description,
+    ...appearance,
+  };
+}
 
 type FilterCategory = 'all' | 'adoption' | 'lost' | 'found';
 
@@ -118,11 +86,61 @@ export function PetSection({
 }: PetSectionProps) {
   const [activeFilter, setActiveFilter] = useState<FilterCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [pets, setPets] = useState(PETS_MOCK);
+  const [pets, setPets] = useState<PetItem[]>([]);
+  const [isLoadingPets, setIsLoadingPets] = useState(true);
+  const [petsError, setPetsError] = useState('');
+  const [reloadPetsKey, setReloadPetsKey] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   
   // Estado que armazena o pet selecionado para abrir a modal
   const [selectedPet, setSelectedPet] = useState<PetItem | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadPets = async () => {
+      setIsLoadingPets(true);
+      setPetsError('');
+
+      try {
+        const { data, error } = await supabase
+          .from('pets')
+          .select('id, name, species, status, breed, gender, location, image_url, description')
+          .order('created_at', { ascending: false });
+
+        if (!isActive) return;
+
+        if (error) {
+          setPetsError(`Não foi possível carregar os anúncios: ${error.message}`);
+        } else {
+          const loadedPets = data.map((pet: PetDatabaseRecord) => mapDatabasePet(pet));
+          setPets((currentPets) => {
+            const currentPetIds = new Set(currentPets.map((pet) => pet.id));
+            return [
+              ...currentPets,
+              ...loadedPets.filter((pet) => !currentPetIds.has(pet.id)),
+            ];
+          });
+        }
+      } catch (error) {
+        if (isActive) {
+          setPetsError(
+            `Não foi possível carregar os anúncios: ${
+              error instanceof Error ? error.message : 'erro desconhecido.'
+            }`,
+          );
+        }
+      } finally {
+        if (isActive) setIsLoadingPets(false);
+      }
+    };
+
+    void loadPets();
+
+    return () => {
+      isActive = false;
+    };
+  }, [reloadPetsKey]);
 
   const filteredPets = pets.filter((pet) => {
     const matchesCategory = activeFilter === 'all' || pet.status === activeFilter;
@@ -213,7 +231,24 @@ export function PetSection({
       </div>
 
       {/* Lista de cards */}
-      {filteredPets.length > 0 ? (
+      {isLoadingPets ? (
+        <p role="status" className="py-12 text-center text-amber-900">
+          Carregando anúncios...
+        </p>
+      ) : petsError ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center">
+          <p role="alert" className="mb-4 text-sm text-red-700">
+            {petsError}
+          </p>
+          <button
+            type="button"
+            onClick={() => setReloadPetsKey((currentKey) => currentKey + 1)}
+            className="rounded-xl bg-red-100 px-4 py-2 text-sm font-bold text-red-800 transition-colors hover:bg-red-200"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      ) : filteredPets.length > 0 ? (
         filteredPets.length > 4 ? (
           <div>
             <div className="flex justify-end gap-2 mb-3">
