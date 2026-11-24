@@ -52,6 +52,12 @@ const PET_STATUS_LABELS: Record<PetStatus, string> = {
   found: 'Encontrado',
 }
 
+const PET_STATUS_COLORS: Record<PetStatus, string> = {
+  adoption: 'bg-amber-600', // Laranja
+  lost: 'bg-red-600',       // Vermelho
+  found: 'bg-cyan-600',     // Azul claro
+}
+
 function getResolutionAction(status: PetStatus): string {
   if (status === 'lost') return 'Marcar como reencontrado'
   if (status === 'found') return 'Marcar como devolvido ao tutor'
@@ -62,6 +68,11 @@ function getResolutionLabel(status: PetStatus): string {
   if (status === 'lost') return 'Reencontrado'
   if (status === 'found') return 'Devolvido ao tutor'
   return 'Adotado'
+}
+
+function getStatusBadgeColor(pet: ProfilePet): string {
+  if (pet.resolved_at) return 'bg-green-600'
+  return PET_STATUS_COLORS[pet.status]
 }
 
 export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
@@ -353,7 +364,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
             <button
               type="submit"
               disabled={isSavingProfile}
-              className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center gap-2 cursor-pointer rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Save size={16} aria-hidden="true" />
               {isSavingProfile ? 'Salvando...' : 'Salvar meus dados'}
@@ -493,7 +504,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <h3 className="text-xl font-bold text-amber-950">{pet.name}</h3>
-                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
+                        <span className={`rounded-full px-3 py-1 text-xs font-bold text-white ${getStatusBadgeColor(pet)}`}>
                           {pet.resolved_at ? getResolutionLabel(pet.status) : PET_STATUS_LABELS[pet.status]}
                         </span>
                       </div>
@@ -507,7 +518,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
                         <button
                           type="button"
                           onClick={() => handleStartEditingPet(pet)}
-                          className="inline-flex items-center gap-2 rounded-xl bg-amber-100 px-4 py-2.5 text-sm font-bold text-amber-950 hover:bg-amber-200"
+                          className="inline-flex items-center gap-2 cursor-pointer rounded-xl bg-amber-100 px-4 py-2.5 text-sm font-bold text-amber-950 hover:bg-amber-200"
                         >
                           <Pencil size={16} aria-hidden="true" />
                           Editar anúncio
@@ -516,7 +527,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
                           type="button"
                           onClick={() => void handleToggleResolution(pet)}
                           disabled={busyPetId === pet.id}
-                          className="inline-flex items-center gap-2 rounded-xl border border-amber-200 px-4 py-2.5 text-sm font-bold text-amber-900 hover:bg-amber-50 disabled:opacity-60"
+                          className="inline-flex items-center gap-2 cursor-pointer rounded-xl border border-amber-200 px-4 py-2.5 text-sm font-bold text-amber-900 hover:bg-amber-50 disabled:opacity-60"
                         >
                           {pet.resolved_at ? (
                             <><RotateCcw size={16} aria-hidden="true" /> Reativar anúncio</>
