@@ -26,6 +26,15 @@ interface ProfilePet {
   created_at: string
 }
 
+interface PetMessage {
+  id: string
+  pet_id: string
+  sender_name: string
+  sender_phone: string
+  message: string
+  created_at: string
+}
+
 type PetDraft = Pick<
   ProfilePet,
   'name' | 'species' | 'status' | 'breed' | 'gender' | 'location' | 'image_url' | 'description'
@@ -80,6 +89,8 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [pets, setPets] = useState<ProfilePet[]>([])
+  const [petMessages, setPetMessages] = useState<PetMessage[]>([])
+  const [messagesError, setMessagesError] = useState('')
   const [editingPetId, setEditingPetId] = useState<string | null>(null)
   const [petDraft, setPetDraft] = useState<PetDraft>(EMPTY_PET_DRAFT)
   const [isLoading, setIsLoading] = useState(true)
@@ -104,7 +115,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
           return
         }
 
-        const [profileResult, petsResult] = await Promise.all([
+        const [profileResult, petsResult, messagesResult] = await Promise.all([
           supabase
             .from('profiles')
             .select('full_name, phone')
@@ -113,6 +124,11 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
           supabase
             .from('pets')
             .select('id, name, species, status, breed, gender, location, image_url, description, resolved_at, created_at')
+            .eq('owner_id', user.id)
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('pet_messages')
+            .select('id, pet_id, sender_name, sender_phone, message, created_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: false }),
         ])
@@ -126,6 +142,12 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
         setFullName(profile.full_name)
         setPhone(profile.phone)
         setPets(petsResult.data as ProfilePet[])
+        if (messagesResult.error) {
+          setMessagesError(`Não foi possível carregar as mensagens: ${messagesResult.error.message}`)
+        } else {
+          setMessagesError('')
+          setPetMessages(messagesResult.data as PetMessage[])
+        }
       } catch (error) {
         if (isActive) {
           setLoadError(
@@ -541,6 +563,57 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
                 )}
               </article>
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="mb-5 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-amber-950">Mensagens recebidas</h2>
+        </div>
+
+        {messagesError ? (
+          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+            {messagesError}
+          </p>
+        ) : petMessages.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/50 px-6 py-8 text-center text-amber-900">
+            Você ainda não recebeu mensagens sobre seus anúncios.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {petMessages.map((petMessage) => {
+              const pet = pets.find((item) => item.id === petMessage.pet_id)
+
+              return (
+                <article
+                  key={petMessage.id}
+                  className="rounded-2xl border border-amber-900/10 bg-white p-5 shadow-sm"
+                >
+                  <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="font-bold text-amber-950">
+                      {petMessage.sender_name}
+                      {pet && <span className="font-normal text-amber-800/70"> · sobre {pet.name}</span>}
+                    </h3>
+                    <time
+                      dateTime={petMessage.created_at}
+                      className="text-xs text-amber-800/60"
+                    >
+                      {new Date(petMessage.created_at).toLocaleString('pt-BR')}
+                    </time>
+                  </div>
+                  <a
+                    href={`tel:${petMessage.sender_phone}`}
+                    className="mb-3 inline-block text-sm font-semibold text-amber-700 hover:underline"
+                  >
+                    {petMessage.sender_phone}
+                  </a>
+                  <p className="whitespace-pre-wrap text-sm text-amber-950/80">
+                    {petMessage.message}
+                  </p>
+                </article>
+              )
+            })}
           </div>
         )}
       </section>

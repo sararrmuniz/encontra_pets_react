@@ -93,6 +93,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
 
       const newPet: PetItem = {
         id: data.id,
+        owner_id: user.id,
         name: name.trim(),
         type,
         status,
@@ -291,7 +292,7 @@ export function CadastrarPetModal({ isOpen, onClose, onAddPet }: CadastrarPetMod
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-4 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full cursor-pointer py-3.5 px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-4 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? 'Publicando...' : 'Publicar Anúncio'}
           </button>

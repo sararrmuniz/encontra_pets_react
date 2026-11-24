@@ -201,7 +201,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full cursor-pointer py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting
               ? 'Aguarde...'

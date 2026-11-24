@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { type PetItem } from './index'; // Vamos exportar a tipagem do pet
+import { useEffect, useState, type FormEvent } from 'react';
+import { supabase } from '@/lib/supabase';
+import { type PetItem } from './index';
 
 interface PetModalProps {
   pet: PetItem | null;
@@ -9,14 +10,106 @@ interface PetModalProps {
 export function PetModal({ pet, onClose }: PetModalProps) {
   const [nomeContato, setNomeContato] = useState('');
   const [telefoneContato, setTelefoneContato] = useState('');
+  const [mensagem, setMensagem] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Se nenhum pet estiver selecionado, não renderiza nada
+  useEffect(() => {
+    let isActive = true;
+
+    const loadContactDetails = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) return;
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (!user) return;
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, phone')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+        if (!isActive) return;
+
+        setNomeContato((currentName) => currentName || data.full_name || '');
+        setTelefoneContato((currentPhone) => currentPhone || data.phone || '');
+      } catch (error) {
+        if (isActive) {
+          setErrorMessage(
+            error instanceof Error
+              ? `Não foi possível preencher seus dados automaticamente: ${error.message}`
+              : 'Não foi possível preencher seus dados automaticamente.',
+          );
+        }
+      }
+    };
+
+    void loadContactDetails();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   if (!pet) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert(`Mensagem enviada com sucesso para o pet ${pet.name}! Entraremos em contato.`);
-    onClose();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+    setIsSubmitting(true);
+
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session) {
+        setErrorMessage('Você precisa estar logado para enviar uma mensagem. Faça login e tente novamente.');
+        return;
+      }
+
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) {
+        setErrorMessage('Você precisa estar logado para enviar uma mensagem. Faça login e tente novamente.');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('pet_messages')
+        .insert({
+          pet_id: pet.id,
+          owner_id: pet.owner_id,
+          sender_id: user.id,
+          sender_name: nomeContato.trim(),
+          sender_phone: telefoneContato.trim(),
+          message: mensagem.trim(),
+        });
+
+      if (error) throw error;
+
+      setSuccessMessage('Mensagem enviada ao anunciante.');
+      setNomeContato('');
+      setTelefoneContato('');
+      setMensagem('');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Auth session missing!') {
+        setErrorMessage('Você precisa estar logado para enviar uma mensagem. Faça login e tente novamente.');
+        return;
+      }
+      setErrorMessage(
+        error instanceof Error
+          ? `Não foi possível enviar a mensagem: ${error.message}`
+          : 'Não foi possível enviar a mensagem.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,13 +162,25 @@ export function PetModal({ pet, onClose }: PetModalProps) {
           {/* Formulário de Contato */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <p className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">
-              Entre em contato sobre este anúncio
+              Envie uma mensagem ao anunciante
             </p>
+
+            {(errorMessage || successMessage) && (
+              <p
+                role={errorMessage ? 'alert' : 'status'}
+                className={`rounded-xl px-4 py-3 text-sm ${
+                  errorMessage ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+                }`}
+              >
+                {errorMessage || successMessage}
+              </p>
+            )}
 
             <div>
               <input
                 type="text"
                 placeholder="Seu Nome"
+                aria-label="Seu nome"
                 value={nomeContato}
                 onChange={(e) => setNomeContato(e.target.value)}
                 required
@@ -85,8 +190,9 @@ export function PetModal({ pet, onClose }: PetModalProps) {
 
             <div>
               <input
-                type="text"
+                type="tel"
                 placeholder="Seu Telefone / WhatsApp"
+                aria-label="Seu telefone ou WhatsApp"
                 value={telefoneContato}
                 onChange={(e) => setTelefoneContato(e.target.value)}
                 required
@@ -94,11 +200,24 @@ export function PetModal({ pet, onClose }: PetModalProps) {
               />
             </div>
 
+            <div>
+              <textarea
+                placeholder="Escreva sua mensagem"
+                aria-label="Mensagem para o anunciante"
+                value={mensagem}
+                onChange={(e) => setMensagem(e.target.value)}
+                required
+                rows={4}
+                className="w-full resize-y px-4 py-3 rounded-xl border border-amber-200 bg-white text-sm text-amber-950 placeholder-amber-800/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-sm"
+              />
+            </div>
+
             <button
               type="submit"
-              className="w-full py-3.5 px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-2"
+              disabled={isSubmitting}
+              className="w-full py-3.5 cursor-pointer px-6 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md transition-all mt-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Enviar Mensagem
+              {isSubmitting ? 'Enviando...' : 'Enviar mensagem'}
             </button>
           </form>
         </div>

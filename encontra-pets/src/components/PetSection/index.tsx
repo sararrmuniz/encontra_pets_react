@@ -12,6 +12,7 @@ const DEFAULT_PET_IMAGE =
 // Exportamos a interface para uso compartilhado
 export interface PetItem extends PetCardProps {
   id: number | string;
+  owner_id: string;
   type: 'dog' | 'cat';
   status: 'adoption' | 'lost' | 'found';
 }
@@ -26,6 +27,7 @@ interface PetDatabaseRecord {
   location: string;
   image_url: string | null;
   description: string;
+  owner_id: string;
 }
 
 function mapDatabasePet(pet: PetDatabaseRecord): PetItem {
@@ -61,6 +63,7 @@ function mapDatabasePet(pet: PetDatabaseRecord): PetItem {
 
   return {
     id: pet.id,
+    owner_id: pet.owner_id,
     name: pet.name,
     type: pet.species,
     status: pet.status,
@@ -105,7 +108,7 @@ export function PetSection({
       try {
         const { data, error } = await supabase
           .from('pets')
-          .select('id, name, species, status, breed, gender, location, image_url, description')
+          .select('id, owner_id, name, species, status, breed, gender, location, image_url, description')
           .is('resolved_at', null)
           .order('created_at', { ascending: false });
 
@@ -323,7 +326,11 @@ export function PetSection({
       )}
 
       {/* Renderização condicional da Modal */}
-      <PetModal pet={selectedPet} onClose={() => setSelectedPet(null)} />
+      <PetModal
+        key={selectedPet?.id ?? 'no-pet'}
+        pet={selectedPet}
+        onClose={() => setSelectedPet(null)}
+      />
       <CadastrarPetModal
         isOpen={isCadastrarPetModalOpen}
         onClose={onCloseCadastrarPet}
