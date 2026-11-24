@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
+import { formatBrazilianPhone, normalizeBrazilianPhone } from '@/lib/phone';
 import { type PetItem } from './index';
 
 interface PetModalProps {
@@ -38,7 +39,7 @@ export function PetModal({ pet, onClose }: PetModalProps) {
         if (!isActive) return;
 
         setNomeContato((currentName) => currentName || data.full_name || '');
-        setTelefoneContato((currentPhone) => currentPhone || data.phone || '');
+        setTelefoneContato((currentPhone) => currentPhone || normalizeBrazilianPhone(data.phone || ''));
       } catch (error) {
         if (isActive) {
           setErrorMessage(
@@ -193,8 +194,11 @@ export function PetModal({ pet, onClose }: PetModalProps) {
                 type="tel"
                 placeholder="Seu Telefone / WhatsApp"
                 aria-label="Seu telefone ou WhatsApp"
-                value={telefoneContato}
-                onChange={(e) => setTelefoneContato(e.target.value)}
+                value={formatBrazilianPhone(telefoneContato)}
+                onChange={(e) => setTelefoneContato(normalizeBrazilianPhone(e.target.value))}
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={15}
                 required
                 className="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white text-sm text-amber-950 placeholder-amber-800/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-sm"
               />

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { PawPrint, Pencil, RotateCcw, Save, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { formatBrazilianPhone, normalizeBrazilianPhone } from '@/lib/phone'
 
 type PetSpecies = 'dog' | 'cat'
 type PetStatus = 'adoption' | 'lost' | 'found'
@@ -140,7 +141,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
         const profile: ProfileRecord = profileResult.data
         setUserId(user.id)
         setFullName(profile.full_name)
-        setPhone(profile.phone)
+        setPhone(normalizeBrazilianPhone(profile.phone))
         setPets(petsResult.data as ProfilePet[])
         if (messagesResult.error) {
           setMessagesError(`Não foi possível carregar as mensagens: ${messagesResult.error.message}`)
@@ -182,7 +183,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: normalizedName, phone: phone.trim() })
+        .update({ full_name: normalizedName, phone })
         .eq('id', userId)
         .select('id')
         .single()
@@ -376,8 +377,11 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
             Telefone / WhatsApp
             <input
               type="tel"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
+              value={formatBrazilianPhone(phone)}
+              onChange={(event) => setPhone(normalizeBrazilianPhone(event.target.value))}
+              inputMode="numeric"
+              autoComplete="tel"
+              maxLength={15}
               required
               className="mt-1 w-full rounded-xl border border-amber-200 px-4 py-2.5 font-normal text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
             />
@@ -606,7 +610,7 @@ export function ProfilePage({ onProfileNameChange }: ProfilePageProps) {
                     href={`tel:${petMessage.sender_phone}`}
                     className="mb-3 inline-block text-sm font-semibold text-amber-700 hover:underline"
                   >
-                    {petMessage.sender_phone}
+                    {formatBrazilianPhone(petMessage.sender_phone)}
                   </a>
                   <p className="whitespace-pre-wrap text-sm text-amber-950/80">
                     {petMessage.message}

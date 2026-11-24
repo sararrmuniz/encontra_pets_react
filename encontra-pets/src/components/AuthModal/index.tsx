@@ -1,6 +1,7 @@
 import { PawPrint } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
+import { formatBrazilianPhone, normalizeBrazilianPhone } from '@/lib/phone';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -158,10 +159,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   Telefone / WhatsApp
                 </label>
                 <input
-                  type="text"
+                  type="tel"
                   placeholder="(34) 99999-9999"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={formatBrazilianPhone(phone)}
+                  onChange={(e) => setPhone(normalizeBrazilianPhone(e.target.value))}
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  maxLength={15}
                   required
                   className="w-full px-4 py-2.5 rounded-xl border border-amber-200 text-sm text-amber-950 placeholder-amber-800/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                 />
@@ -176,7 +180,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <input
               type="email"
               placeholder="seu@email.com"
-              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2.5 rounded-xl border border-amber-200 text-sm text-amber-950 placeholder-amber-800/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
@@ -190,7 +193,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <input
               type="password"
               placeholder="••••••••"
-              value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={6}
               required
